@@ -4,48 +4,47 @@ import gridGame.Vector2Int
 import gridGame.grid.node.GridNode
 import gridGame.grid.node.NodeDirection
 import gridGame.grid.node.NodeType
-import java.io.File
 import java.security.InvalidParameterException
 
-class GridModel(private val filePath: String) {
+class GridModel(private var info: GridInfo) {
 
     private val BLOCKEDCHAR = '#'
     private val STARTCHAR = 'S'
     private val ENDCHAR = 'E'
 
     internal var startPos = Vector2Int(-1, -1)
+        private set
+
     internal var endPos = Vector2Int(-1, -1)
+        private set
 
-    internal val sizeX: Int
-    internal val sizeY: Int
+    //encapsulated by <val>?
+    internal var sizeX: Int = info.sizeX
+        private set
+    internal var sizeY: Int = info.sizeY
+        private set
+    internal var nodes: Array<GridNode?> = arrayOfNulls(sizeY * sizeX)
+        private set
 
-    internal val nodes: Array<GridNode?>
 
     init {
-        val file = File(filePath)
-        val lines = file.readText().lines()
+        build()
+    }
 
-        val lineCount = lines.count()
-        var minLineSize = Int.MAX_VALUE
-
-        //read grid
-        //find the shortest line
-        //find line count
-        lines.forEach {
-            if (it.length < minLineSize)
-                minLineSize = it.length
-        }
-
-        sizeY = lineCount
-        sizeX = minLineSize
-
-        //make grid <line count> X <the shortest line char count>
+    fun reBuild(newInfo: GridInfo) {
+        info = newInfo
+        sizeX = info.sizeX
+        sizeY = info.sizeY
         nodes = arrayOfNulls(sizeY * sizeX)
+        build()
+    }
 
+    private fun build() {
+        //make grid <line count> X <the shortest line char count>
         //create nodes
-        var index: Int = 0
+        var index = 0
         for (y in 0 until sizeY) {
-            val line = lines[y]
+            val line = info.inputLines[y]
             for (x in 0 until sizeX) {
                 createNode(x, y, index, line[x])
                 index++
@@ -57,7 +56,6 @@ class GridModel(private val filePath: String) {
 
         if (endPos == Vector2Int(-1, -1))
             throw InvalidParameterException("end pos is not present in file")
-
     }
 
     private fun createNode(x: Int, y: Int, i: Int, char: Char) {

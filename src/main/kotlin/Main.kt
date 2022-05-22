@@ -14,11 +14,12 @@ fun main() {
     val path = "${System.getProperty("user.dir")}\\grid.txt"
 
     val reader = Scanner(System.`in`)
-    var autoModeChar: Char = ' '
+    var autoModeChar = ' '
     var exitFlag = false
 
 
-    val gridModel = GridModel(path)
+    val initGridModel = GridInfo(path)
+    val gridModel = GridModel(initGridModel)
     val renderMatrix = RenderMatrix(Vector2Int(gridModel.sizeX, gridModel.sizeY))
     val gridView = GridView(renderMatrix)
     val gridController = GridController(gridModel,gridView)
